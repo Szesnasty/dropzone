@@ -43,6 +43,7 @@ export function MultipleFileUploadField({ name }: { name: string }) {
     setFiles((curr) => [...curr, ...mappedAcc, ...mappedRej]);
   }, []);
 
+  console.log(files);
   useEffect(() => {
     helpers.setValue(files);
     // helpers.setTouched(true);

@@ -8,7 +8,12 @@ export interface SingleFileUploadWithProgressProps {
   onUpload: (file: File, url: string) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function SingleFileUploadWithProgress({ file, onDelete, onUpload }: SingleFileUploadWithProgressProps) {
+  const reader = new FileReader();
+
+  const x = reader.readAsDataURL(file);
+  console.log(x);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -28,10 +33,11 @@ export function SingleFileUploadWithProgress({ file, onDelete, onUpload }: Singl
   );
 }
 
-function uploadFile(files: File, onProgress: (percentage: number) => void) {
+function uploadFile(singleFile: File, onProgress: (percentage: number) => void) {
+  console.log(singleFile);
   return new Promise<string>((res, rej) => {
     const formData = new FormData();
-    formData.append('file', files);
+    formData.append('file', singleFile);
 
     const xhr = new XMLHttpRequest();
 
@@ -42,6 +48,7 @@ function uploadFile(files: File, onProgress: (percentage: number) => void) {
         console.log(percentage); // Update progress here
       }
     };
+    xhr.onerror = (evt) => rej(evt);
     xhr.onreadystatechange = () => {
       if (xhr.readyState !== 4) return;
       if (xhr.status !== 200) {
@@ -49,7 +56,7 @@ function uploadFile(files: File, onProgress: (percentage: number) => void) {
       }
       console.log('success'); // Handle success here
     };
-    xhr.open('POST', '', true);
+    xhr.open('', '', true);
     xhr.send(formData);
   });
 }
