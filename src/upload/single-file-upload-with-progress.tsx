@@ -51,10 +51,16 @@ function uploadFile(singleFile: File, onProgress: (percentage: number) => void, 
     const result = event?.target?.result;
 
     setFiles((curr: any[]) =>
-      curr.map((fw) => {
-        console.log(fw);
+      curr.map((fw, index) => {
+        console.log('ELOOOOOOOOOOOOOOOO');
+        console.log(fw?.file);
+        console.log(singleFile);
         if (fw.file === singleFile) {
-          return { ...fw, remoteDocument: { bytes: result && btoa(result?.toString()), name: singleFile.name } };
+          return {
+            ...fw,
+            index: index,
+            remoteDocument: { bytes: result && btoa(result?.toString()), name: singleFile.name },
+          };
         }
         return fw;
       }),
