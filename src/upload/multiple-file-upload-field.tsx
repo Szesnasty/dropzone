@@ -51,7 +51,7 @@ export function MultipleFileUploadField({ name }: { name: string }) {
   useEffect(() => {
     console.log(files);
     helpers.setValue(files);
-    // helpers.setTouched(true);
+    helpers.setTouched(true);
   }, [files]);
 
   function onDelete(file: File) {

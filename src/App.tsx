@@ -6,26 +6,33 @@ import { MultipleFileUploadField } from './upload/multiple-file-upload-field';
 
 import './App.css';
 
+type InitialDataModel = {
+  files: { bytes: string; name: string }[];
+};
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const App = () => {
   return (
     <Card>
       <CardContent>
-        <Formik
+        <Formik<InitialDataModel>
           initialValues={{ files: [] }}
           validationSchema={object({
             files: array(
               object({
-                filename: string().required(),
-                path: string().required(),
-                fileSize: string().required(),
-                base64File: string().required(),
-                type: string(),
+                remoteDocument: object({
+                  bytes: string().required(),
+                  name: string().required(),
+                }),
               }),
             ),
           })}
           onSubmit={(values) => {
-            console.log('values', values);
+            console.log(
+              'documents',
+              values.files.map((x) => {
+                return { bytes: x.bytes, name: x.name };
+              }),
+            );
             return new Promise((res) => setTimeout(res, 2000));
           }}
         >

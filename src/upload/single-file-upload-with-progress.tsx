@@ -49,12 +49,12 @@ function uploadFile(singleFile: File, onProgress: (percentage: number) => void, 
 
   reader.addEventListener('load', (event) => {
     const result = event?.target?.result;
-    console.log(result && btoa(result?.toString()));
+
     setFiles((curr: any[]) =>
       curr.map((fw) => {
         console.log(fw);
         if (fw.file === singleFile) {
-          return { ...fw, result: result && btoa(result?.toString()) };
+          return { ...fw, remoteDocument: { bytes: result && btoa(result?.toString()), name: singleFile.name } };
         }
         return fw;
       }),
