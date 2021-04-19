@@ -1,21 +1,48 @@
+import { Button, Card, CardContent, Grid } from '@material-ui/core';
+import { Form, Formik } from 'formik';
 import React from 'react';
-import logo from './logo.svg';
+import { array, object, string } from 'yup';
+import { MultipleFileUploadField } from './upload/multiple-file-upload-field';
+
 import './App.css';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Card>
+      <CardContent>
+        <Formik
+          initialValues={{ files: [] }}
+          validationSchema={object({
+            files: array(
+              object({
+                url: string().required(),
+              }),
+            ),
+          })}
+          onSubmit={(values) => {
+            console.log('values', values);
+            return new Promise((res) => setTimeout(res, 2000));
+          }}
+        >
+          {({ values, errors, isValid, isSubmitting }) => (
+            <Form>
+              <Grid container spacing={2} direction="column">
+                <MultipleFileUploadField name="files" />
+
+                <Grid item>
+                  <Button variant="contained" color="primary" disabled={!isValid || isSubmitting} type="submit">
+                    Submit
+                  </Button>
+                </Grid>
+              </Grid>
+
+              <pre>{JSON.stringify({ values, errors }, null, 4)}</pre>
+            </Form>
+          )}
+        </Formik>
+      </CardContent>
+    </Card>
   );
 };
 
