@@ -32,33 +32,27 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function MultipleFileUploadField({ name }: { name: string }) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, __, helpers] = useField(name);
   const classes = useStyles();
 
   const [files, setFiles] = useState<UploadableFile[]>([]);
   const onDrop = useCallback((accFiles: File[], rejFiles: FileRejection[]) => {
-    const mappedAcc = accFiles.map((file) => ({ file, errors: [], id: getNewId() }));
+    const mappedAcc = accFiles.map((file) => {
+      return { file, errors: [], id: getNewId() };
+    });
     const mappedRej = rejFiles.map((r) => ({ ...r, id: getNewId() }));
+
     setFiles((curr) => [...curr, ...mappedAcc, ...mappedRej]);
   }, []);
 
-  console.log(files);
   useEffect(() => {
+    console.log(files);
     helpers.setValue(files);
     // helpers.setTouched(true);
   }, [files]);
-
-  function onUpload(file: File, url: string) {
-    setFiles((curr) =>
-      curr.map((fw) => {
-        if (fw.file === file) {
-          return { ...fw, url };
-        }
-        return fw;
-      }),
-    );
-  }
 
   function onDelete(file: File) {
     setFiles((curr) => curr.filter((fw) => fw.file !== file));
@@ -85,7 +79,7 @@ export function MultipleFileUploadField({ name }: { name: string }) {
           {fileWrapper.errors.length ? (
             <UploadError file={fileWrapper.file} errors={fileWrapper.errors} onDelete={onDelete} />
           ) : (
-            <SingleFileUploadWithProgress onDelete={onDelete} onUpload={onUpload} file={fileWrapper.file} />
+            <SingleFileUploadWithProgress onDelete={onDelete} setFiles={setFiles} file={fileWrapper.file} />
           )}
         </Grid>
       ))}

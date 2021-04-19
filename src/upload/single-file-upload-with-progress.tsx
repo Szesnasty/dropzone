@@ -5,18 +5,23 @@ import { FileHeader } from './file-header';
 export interface SingleFileUploadWithProgressProps {
   file: File;
   onDelete: (file: File) => void;
-  onUpload: (file: File, url: string) => void;
+
+  setFiles: any;
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export function SingleFileUploadWithProgress({ file, onDelete, onUpload }: SingleFileUploadWithProgressProps) {
+export function SingleFileUploadWithProgress({
+  file,
+  onDelete,
+
+  setFiles,
+}: SingleFileUploadWithProgressProps) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    async function upload() {
-      const base64File = await uploadFile(file, setProgress);
-      onUpload(file, base64File);
-    }
+    const upload = () => {
+      uploadFile(file, setProgress, setFiles);
+    };
 
     upload();
   }, []);
@@ -29,24 +34,31 @@ export function SingleFileUploadWithProgress({ file, onDelete, onUpload }: Singl
   );
 }
 
-function uploadFile(singleFile: File, onProgress: (percentage: number) => void) {
+function uploadFile(singleFile: File, onProgress: (percentage: number) => void, setFiles: any) {
   console.log(singleFile);
-  return new Promise<string>((res, rej) => {
-    const reader = new FileReader();
 
-    reader.addEventListener('progress', (event) => {
-      if (event.loaded && event.total) {
-        const percent = (event.loaded / event.total) * 100;
-        onProgress(Math.round(percent));
-        console.log(`Progress: ${Math.round(percent)}`);
-      }
-    });
+  const reader = new FileReader();
+  reader.readAsDataURL(singleFile);
+  reader.addEventListener('progress', (event) => {
+    if (event.loaded && event.total) {
+      const percent = (event.loaded / event.total) * 100;
+      onProgress(Math.round(percent));
+      console.log(`Progress: ${Math.round(percent)}`);
+    }
+  });
 
-    reader.addEventListener('load', (event) => {
-      const result = event?.target?.result;
-      console.log(result && btoa(result?.toString()));
-      // Do something with result
-    });
-    return reader.readAsDataURL(singleFile);
+  reader.addEventListener('load', (event) => {
+    const result = event?.target?.result;
+    console.log(result && btoa(result?.toString()));
+    setFiles((curr: any[]) =>
+      curr.map((fw) => {
+        console.log(fw);
+        if (fw.file === singleFile) {
+          return { ...fw, result: result && btoa(result?.toString()) };
+        }
+        return fw;
+      }),
+    );
+    // Do something with result
   });
 }

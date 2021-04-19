@@ -16,7 +16,11 @@ export const App = () => {
           validationSchema={object({
             files: array(
               object({
-                url: string().required(),
+                filename: string().required(),
+                path: string().required(),
+                fileSize: string().required(),
+                base64File: string().required(),
+                type: string(),
               }),
             ),
           })}

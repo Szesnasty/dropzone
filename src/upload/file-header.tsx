@@ -10,6 +10,7 @@ export function FileHeader({ file, onDelete }: FileHeaderProps) {
   return (
     <Grid container justify="space-between" alignItems="center">
       <Grid item>{file.name}</Grid>
+      <Grid item>{file.size}</Grid>
       <Grid item>
         <Button size="small" onClick={() => onDelete(file)}>
           Delete
