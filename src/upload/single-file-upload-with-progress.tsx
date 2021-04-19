@@ -10,16 +10,12 @@ export interface SingleFileUploadWithProgressProps {
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function SingleFileUploadWithProgress({ file, onDelete, onUpload }: SingleFileUploadWithProgressProps) {
-  const reader = new FileReader();
-
-  const x = reader.readAsDataURL(file);
-  console.log(x);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     async function upload() {
-      const url = await uploadFile(file, setProgress);
-      onUpload(file, url);
+      const base64File = await uploadFile(file, setProgress);
+      onUpload(file, base64File);
     }
 
     upload();
@@ -36,27 +32,21 @@ export function SingleFileUploadWithProgress({ file, onDelete, onUpload }: Singl
 function uploadFile(singleFile: File, onProgress: (percentage: number) => void) {
   console.log(singleFile);
   return new Promise<string>((res, rej) => {
-    const formData = new FormData();
-    formData.append('file', singleFile);
+    const reader = new FileReader();
 
-    const xhr = new XMLHttpRequest();
+    reader.addEventListener('progress', (event) => {
+      if (event.loaded && event.total) {
+        const percent = (event.loaded / event.total) * 100;
+        onProgress(Math.round(percent));
+        console.log(`Progress: ${Math.round(percent)}`);
+      }
+    });
 
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percentage = +(+event.loaded / +event.total) * 100;
-        onProgress(Math.round(percentage));
-        console.log(percentage); // Update progress here
-      }
-    };
-    xhr.onerror = (evt) => rej(evt);
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState !== 4) return;
-      if (xhr.status !== 200) {
-        console.log('error'); // Handle error here
-      }
-      console.log('success'); // Handle success here
-    };
-    xhr.open('', '', true);
-    xhr.send(formData);
+    reader.addEventListener('load', (event) => {
+      const result = event?.target?.result;
+      console.log(result && btoa(result?.toString()));
+      // Do something with result
+    });
+    return reader.readAsDataURL(singleFile);
   });
 }
